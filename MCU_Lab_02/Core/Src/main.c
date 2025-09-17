@@ -68,7 +68,8 @@ static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 void led_PA5_Toggle();
 void display7SEG(int num);
-void writeSignalPin();
+void write7SegPin();
+void blinkDoubleDot();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -120,12 +121,13 @@ int main(void)
 	{
 		setTimer(0, 1000);
 		led_PA5_Toggle();
+		blinkDoubleDot();
 	}
 
 	if (isTimerExpired(1) == 1)
 	{
 		setTimer(1, 500);
-		writeSignalPin();
+		write7SegPin();
 	}
     /* USER CODE END WHILE */
 
@@ -291,10 +293,12 @@ void display7SEG(int num)
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, !((seg >> 0) & 0x1));
 }
 
-void writeSignalPin()
+void write7SegPin()
 {
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
 
 	switch(led)
 	{
@@ -307,12 +311,29 @@ void writeSignalPin()
 	case 2:
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
 		display7SEG(2);
+		led = 3;
+		break;
+
+	case 3:
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
+		display7SEG(3);
+		led = 4;
+		break;
+
+	case 4:
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
+		display7SEG(0);
 		led = 1;
 		break;
 
 	default:
 		break;
 	}
+}
+
+void blinkDoubleDot()
+{
+	HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
 }
 /* USER CODE END 4 */
 
