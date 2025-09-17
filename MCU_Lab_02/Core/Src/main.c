@@ -63,6 +63,10 @@ static uint8_t segPattern[10] =
 const int MAX_LED = 4;
 int index_led = 0;
 int led_buffer[4] = {1, 2, 3, 4};
+
+int hour = 15;
+int minute = 8;
+int second = 50;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -74,6 +78,7 @@ void led_PA5_Toggle();
 void display7SEG(int num);
 void blinkDoubleDot();
 void update7SEG(int index);
+void updateClockBuffer();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -122,6 +127,7 @@ int main(void)
   // 1Hz <=> 1s (f = 1/T)
   // 4 LEDs in 1s -> 1 LEDs in 250ms
   setTimer(1, 250);
+  setTimer(2, 1000);
   while (1)
   {
 	if (isTimerExpired(0) == 1)
@@ -137,6 +143,25 @@ int main(void)
 		if (index_led >= MAX_LED)
 			index_led = 0;
 		update7SEG(index_led++);
+	}
+
+	if (isTimerExpired(2) == 1)
+	{
+		setTimer(2, 1000);
+		second++;
+		if (second >= 60)
+		{
+			second = 0;
+			minute++;
+		}
+		if (minute >= 60)
+		{
+			minute = 0;
+			hour++;
+		}
+		if (hour >= 24)
+			hour = 0;
+		updateClockBuffer();
 	}
     /* USER CODE END WHILE */
 
@@ -331,6 +356,14 @@ void update7SEG(int index)
 	default:
 		break;
 	}
+}
+
+void updateClockBuffer()
+{
+	led_buffer[0] = hour / 10;
+	led_buffer[1] = hour % 10;
+	led_buffer[2] = minute / 10;
+	led_buffer[3] = minute % 10;
 }
 /* USER CODE END 4 */
 
