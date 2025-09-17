@@ -118,7 +118,10 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   setTimer(0, 1000);	//one second
-  setTimer(1, 500);		//half of second
+  // set the frequency of 4 seven segment LEDs to 1Hz
+  // 1Hz <=> 1s (f = 1/T)
+  // 4 LEDs in 1s -> 1 LEDs in 250ms
+  setTimer(1, 250);
   while (1)
   {
 	if (isTimerExpired(0) == 1)
@@ -130,7 +133,7 @@ int main(void)
 
 	if (isTimerExpired(1) == 1)
 	{
-		setTimer(1, 500);
+		setTimer(1, 250);
 		if (index_led >= MAX_LED)
 			index_led = 0;
 		update7SEG(index_led++);
