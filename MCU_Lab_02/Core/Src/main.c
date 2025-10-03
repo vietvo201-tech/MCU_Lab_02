@@ -69,26 +69,19 @@ int second = 50;
 //Exercise 9
 const int MAX_LED_MATRIX = 8;
 int index_led_matrix = 0;
-//uint8_t matrix_buffer[8] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
-uint8_t matrix_buffer[8] = {
-		0b01111110,
-		0b10010000,
-		0b10010000,
-		0b10010000,
-		0b10010000,
-		0b10010000,
-		0b10010000,
-		0b01111110
+uint8_t matrix_buffer[8] = { 0 };
 
-//		0b11000000,
-//		0b01100000,
-//		0b00110000,
-//		0b00011000,
-//		0b00001100,
-//		0b00000110,
-//		0b00000011,
-//		0b00000001,
+uint8_t font_A[8] = {
+	0b00000000,
+	0b00111111,
+	0b01010000,
+	0b10010000,
+	0b10010000,
+	0b01010000,
+	0b00111111,
+	0b00000000
 };
+int pos = 8;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -102,6 +95,7 @@ void blinkDoubleDot();
 void update7SEG(int index);
 void updateClockBuffer();
 void updateLEDMatrix(int index);
+void scrollCharStep(uint8_t *);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -151,7 +145,8 @@ int main(void)
   // 4 LEDs in 1s -> 1 LEDs in 250ms
   setTimer(1, 250);
   setTimer(2, 1000);
-  setTimer(3, 30);
+  setTimer(3, 50);
+  setTimer(4, 1000);
   while (1)
   {
 	if (isTimerExpired(0) == 1)
@@ -190,11 +185,17 @@ int main(void)
 
 	if (isTimerExpired(3) == 1)
 	{
-		setTimer(3, 30);
+		setTimer(3, 50);
 		updateLEDMatrix(index_led_matrix);
 		index_led_matrix++;
 		if (index_led_matrix >= MAX_LED_MATRIX)
 			index_led_matrix = 0;
+	}
+
+	if (isTimerExpired(4) == 1)
+	{
+		setTimer(4, 1000);
+		scrollCharStep(font_A);
 	}
     /* USER CODE END WHILE */
 
@@ -458,6 +459,21 @@ void updateLEDMatrix(int index)
 	default:
 		break;
 	}
+}
+
+void scrollCharStep(uint8_t *charBitmap)
+{
+    for (int col = 0; col < 8; col++)
+    {
+        int srcCol = col - pos;
+        if (srcCol >= 0 && srcCol < 8)
+            matrix_buffer[col] = charBitmap[srcCol];
+        else
+            matrix_buffer[col] = 0x00;
+    }
+    pos--;
+    if (pos < -8)
+    	pos = 8; // lặp lại
 }
 /* USER CODE END 4 */
 
